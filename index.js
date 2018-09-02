@@ -4,12 +4,46 @@
 
 // dependencies
 const http = require("http");
+const https = require("https");
 const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
 const config = require("./config");
+var fs = require("fs");
 // the server should respond to all requests with a string
 
-const server = http.createServer((request, response) => {
+// instantiate HTTP server
+const httpServer = http.createServer((request, response) => {
+  unifiedServer(request, response);
+});
+
+// start the HTTP server
+httpServer.listen(config.httpPort, () => {
+  console.log(
+    `Server is listening on port ${config.httpPort} in ${config.envName} mode`
+  );
+});
+
+// instantiate HTTPS server
+const httpsServerOptions = {
+  key: fs.readFileSync("./https/key.pem"),
+  cert: fs.readFileSync("./https/cert.pem")
+};
+const httpsServer = https.createServer(
+  httpsServerOptions,
+  (request, response) => {
+    unifiedServer(request, response);
+  }
+);
+
+// start the HTTP server
+httpsServer.listen(config.httpsPort, () => {
+  console.log(
+    `Server is listening on port ${config.httpsPort} in ${config.envName} mode`
+  );
+});
+
+// server logic for http and https
+var unifiedServer = (request, response) => {
   // Get the URL and parse it
   const parsedUrl = url.parse(request.url, true);
   // Get path
@@ -68,30 +102,28 @@ const server = http.createServer((request, response) => {
       //Log request path
       console.log(
         `Request recieved at path : ${trimmedPath} 
-         method: ${method} 
-         query : ${queryObject} 
-         headers : ${headers}
-         payload: ${buffer}
-         payloadString: ${payloadString}`
+       method: ${method} 
+       query : ${queryObject} 
+       headers : ${headers}
+       payload: ${buffer}
+       payloadString: ${payloadString}`
       );
     });
   });
-});
-
-// start the server
-server.listen(config.port, () => {
-  console.log(
-    `Server is listening on port ${config.port} in ${config.envName} mode`
-  );
-});
+};
 
 //routing handlers
-
 var handlers = {};
 
 handlers.sample = (data, callback) => {
   //perform business logic and return http status code and response data / payoad object
   callback(406, { name: "Bhupali" });
+};
+
+//for ping handler
+handlers.ping = (data, callback) => {
+  //perform business logic and return status code and response data
+  callback(200);
 };
 
 //for 404
@@ -101,5 +133,6 @@ handlers.notFound = (data, callback) => {
 };
 
 var router = {
-  sample: handlers.sample
+  sample: handlers.sample,
+  ping: handlers.ping
 };
