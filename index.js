@@ -6,6 +6,7 @@
 const http = require("http");
 const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
+const config = require("./config");
 // the server should respond to all requests with a string
 
 const server = http.createServer((request, response) => {
@@ -77,9 +78,11 @@ const server = http.createServer((request, response) => {
   });
 });
 
-// start the server and make it listen to port 5001
-server.listen(5001, () => {
-  console.log("Server is listening on port 5001");
+// start the server
+server.listen(config.port, () => {
+  console.log(
+    `Server is listening on port ${config.port} in ${config.envName} mode`
+  );
 });
 
 //routing handlers
