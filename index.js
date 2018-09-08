@@ -9,7 +9,29 @@ const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
 const config = require("./config");
 var fs = require("fs");
+var dataSaver = require("./lib");
 // the server should respond to all requests with a string
+
+// Test
+// @TODO : delete this
+// dataSaver.create("test", "test", { hello: true }, response => {
+//   console.log(response.message);
+// });
+
+// Test
+// @TODO : delete this
+dataSaver.read("test", "test", response => {
+  console.log(
+    "\ndata: ",
+    response.data,
+    "\nerror: ",
+    response.error,
+    "\nsuccess: ",
+    response.success,
+    "\nmessage: ",
+    response.message
+  );
+});
 
 // instantiate HTTP server
 const httpServer = http.createServer((request, response) => {
